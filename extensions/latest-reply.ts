@@ -87,6 +87,8 @@ class ReplyViewer {
   private select(index: number): void {
     this.index = Math.max(0, Math.min(this.replies.length - 1, index));
     this.offset = 0;
+    this.searchMatches = [];
+    this.status = this.searchQuery ? `Search: ${this.searchQuery}` : "";
     this.markdown = new Markdown(this.replies[this.index], 0, 0, getMarkdownTheme());
   }
 
@@ -108,9 +110,9 @@ class ReplyViewer {
 
   handleInput(data: string): void {
     if (this.searchMode) {
-      if (matchesKey(data, Key.escape)) {
+      if (matchesKey(data, Key.escape) || matchesKey(data, "escape") || data === "\x1b") {
         this.searchMode = false;
-        this.status = "";
+        this.status = this.searchQuery ? `Search: ${this.searchQuery}` : "";
       } else if (matchesKey(data, Key.enter)) {
         this.searchMode = false;
         this.nextMatch(1);
@@ -137,7 +139,7 @@ class ReplyViewer {
       return;
     }
 
-    if (matchesKey(data, Key.escape) || matchesBinding(data, "pi.latestReply.close", ["q"]) || matchesBinding(data, "pi.latestReply.open", ["alt+v"])) {
+    if (matchesKey(data, Key.escape) || matchesKey(data, "escape") || data === "\x1b" || matchesBinding(data, "pi.latestReply.close", ["q"]) || matchesBinding(data, "pi.latestReply.open", ["alt+v"])) {
       this.done();
       return;
     }

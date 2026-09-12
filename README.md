@@ -96,7 +96,7 @@ Pi's normal editor binding for `Ctrl+U` can be disabled separately in `~/.pi/age
 
 - The popup is an overlay, so it works in regular and fullscreen Pi TUI modes.
 - Pi must receive `Alt+V`; terminal and tmux key mappings can intercept modified keys.
-- The viewer is read-only. Search is intentionally lightweight: `/` starts a case-insensitive fuzzy subsequence search, `n`/`Shift+N` cycle matches, and `Escape` cancels. It does not attempt to implement full Vim counts or modes.
+- The viewer is read-only. Search is intentionally lightweight: `/` starts a case-insensitive fuzzy subsequence search, `n`/`Shift+N` cycle matches, and `Escape` cancels search without closing the popup. The search query remains active when moving between replies with `h`/`l`, and matches are recalculated for the newly selected reply. It does not attempt to implement full Vim counts or modes.
 - Copying deliberately uses Pi's exported clipboard utility; it does not duplicate Pi's `/copy` command.
 - `/latest-reply` is useful for testing when a terminal or tmux setup intercepts `Alt+V`.
 
