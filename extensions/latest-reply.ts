@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { Key, Markdown, matchesKey, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
+import { Key, Markdown, matchesKey, sliceByColumn, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { copyToClipboard, getMarkdownTheme } from "@earendil-works/pi-coding-agent";
 
 let replies: string[] = [];
@@ -43,14 +43,22 @@ function stripAnsi(text: string): string {
   return text.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, "");
 }
 
-function fuzzyIncludes(text: string, query: string): boolean {
+function fuzzySpan(text: string, query: string): [number, number] | undefined {
   let index = 0;
+  let start = -1;
+  let end = -1;
   for (const char of query.toLowerCase()) {
     index = text.toLowerCase().indexOf(char, index);
-    if (index < 0) return false;
+    if (index < 0) return undefined;
+    if (start < 0) start = index;
+    end = index + 1;
     index++;
   }
-  return true;
+  return start < 0 ? undefined : [start, end];
+}
+
+function fuzzyIncludes(text: string, query: string): boolean {
+  return fuzzySpan(text, query) !== undefined;
 }
 
 class ReplyViewer {
@@ -161,8 +169,18 @@ class ReplyViewer {
       : [];
 
     const border = (line: string) => this.theme.fg(this.borderColor, line);
-    const body = (line: string) => {
-      const content = truncateToWidth(line, contentWidth);
+    const body = (line: string, row = -1) => {
+      let content = truncateToWidth(line, contentWidth);
+      if (this.searchQuery) {
+        const span = fuzzySpan(stripAnsi(content), this.searchQuery);
+        if (span) {
+          const before = sliceByColumn(content, 0, span[0], true);
+          const match = sliceByColumn(content, span[0], span[1] - span[0], true);
+          const after = sliceByColumn(content, span[1], contentWidth, true);
+          const style = row === this.offset ? "selectedBg" : "searchMatchBg";
+          content = before + this.theme.bg(style, match) + after;
+        }
+      }
       return border("│") + " " + content + " ".repeat(Math.max(0, contentWidth - visibleWidth(content))) + " " + border("│");
     };
     const top = border("╭" + "─".repeat(Math.max(0, width - 2)) + "╮");
@@ -176,7 +194,13 @@ class ReplyViewer {
     const footerText = this.status || `${this.offset + 1}-${Math.min(this.offset + pageSize, rendered.length)} / ${rendered.length}  •  [${keysFor("pi.latestReply.copy", ["ctrl+c"])[0]}] copy  •  close and use /copy`;
     const footer = body(this.theme.fg(this.status ? "warning" : "dim", footerText));
 
-    return [top, header, ...rendered.slice(this.offset, this.offset + pageSize).map(body), footer, bottom];
+    return [
+      top,
+      header,
+      ...rendered.slice(this.offset, this.offset + pageSize).map((line, index) => body(line, this.offset + index)),
+      footer,
+      bottom,
+    ];
   }
 
   invalidate(): void {}
