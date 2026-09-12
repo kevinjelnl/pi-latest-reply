@@ -15,7 +15,7 @@ Useful when Pi is running in a small terminal, over SSH, or inside tmux and scro
 From npm:
 
 ```bash
-pi install npm:pi-latest-reply
+pi install npm:@kevinjel/pi-latest-reply
 ```
 
 Or install directly from GitHub:
@@ -143,6 +143,6 @@ Pi provides `@earendil-works/pi-coding-agent` and `@earendil-works/pi-tui` when 
 
 ## Package metadata
 
-This repository is a Pi package: `package.json` declares the `pi-package` keyword and the `pi.extensions` manifest used by Pi's package gallery. The npm package contains the README, license, manifest, extension, and these two screenshots. It contains no credentials, project-local settings, recordings, or generated session data.
+This repository is a Pi package: `package.json` declares the `pi-package` keyword and the `pi.extensions` manifest used by Pi's package gallery. The npm package is published as `@kevinjel/pi-latest-reply`. The npm package contains the README, license, manifest, extension, and these two screenshots. It contains no credentials, project-local settings, recordings, or generated session data.
 
 The GitHub source repository is also available for review and direct installation.

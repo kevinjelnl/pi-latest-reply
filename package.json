@@ -1,19 +1,22 @@
 {
-  "name": "pi-latest-reply",
+  "name": "@kevinjel/pi-latest-reply",
   "version": "0.1.0",
   "description": "Open the latest Pi assistant response in a keyboard-navigable popup.",
   "keywords": [
     "pi-package",
     "pi",
-    "pi-coding-agent",
     "pi-extension",
+    "reply-viewer",
+    "response-viewer",
+    "reply-history",
+    "reply-navigation",
+    "conversation-viewer",
+    "chat-history",
+    "markdown",
+    "vim",
     "terminal",
     "tmux",
-    "ssh",
-    "vim",
-    "markdown",
-    "chat-history",
-    "response-viewer"
+    "ssh"
   ],
   "license": "MIT",
   "repository": {
@@ -29,9 +32,12 @@
   ],
   "pi": {
     "extensions": [
-      "./extensions"
+      "./extensions/latest-reply.ts"
     ],
     "image": "https://raw.githubusercontent.com/kevinjelnl/pi-latest-reply/main/assets/screenshot_01.png"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*",
