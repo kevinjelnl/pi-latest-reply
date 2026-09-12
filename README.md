@@ -9,7 +9,7 @@ Useful when Pi is running in a small terminal, over SSH, or inside tmux and scro
 From a Git repository:
 
 ```bash
-pi install git:github.com/YOUR_USERNAME/pi-latest-reply-viewer
+pi install git:github.com/kevinjelnl/pi-latest-reply-viewer
 ```
 
 Or try a local checkout:
@@ -46,8 +46,8 @@ The popup supports:
 |---|---|
 | `h` / `l` | Show the previous/next assistant response |
 | `Shift+L` | Jump to the most recent response |
-| `/` | Start fuzzy search |
-| `n` / `Shift+N` | Next/previous fuzzy match |
+| `/` | Start whole-word search |
+| `n` / `Shift+N` | Next/previous match |
 | `Ctrl+C` | Copy the latest reply; disabled on older replies |
 | `j` / `k` | Move down/up one line |
 | `Ctrl+D` / `Ctrl+U` | Move down/up by a page |
@@ -120,28 +120,27 @@ The extension is a single TypeScript file:
 extensions/latest-reply.ts
 ```
 
-Pi provides `@earendil-works/pi-tui` when loading extensions, so it is listed as a peer dependency rather than bundled into this package.
+Pi provides `@earendil-works/pi-coding-agent` and `@earendil-works/pi-tui` when loading extensions, so they are listed as peer dependencies rather than bundled into this package.
 
 ## Publishing
 
-1. Create a public GitHub repository named `pi-latest-reply-viewer`.
-2. Copy this package into the repository.
-3. Replace `YOUR_USERNAME` in this README with your GitHub username.
-4. Commit and push:
+1. Create a public GitHub repository named `pi-latest-reply-viewer` under `kevinjelnl`.
+2. Push this package to the repository.
+3. Commit and push:
 
 ```bash
 git init
 git add .
 git commit -m "Initial release"
 git branch -M main
-git remote add origin git@github.com:YOUR_USERNAME/pi-latest-reply-viewer.git
+git remote add origin git@github.com:kevinjelnl/pi-latest-reply-viewer.git
 git push -u origin main
 ```
 
-5. Test the published package:
+4. Test the published package:
 
 ```bash
-pi install git:github.com/YOUR_USERNAME/pi-latest-reply-viewer
+pi install git:github.com/kevinjelnl/pi-latest-reply-viewer
 ```
 
 Pi's package gallery discovers packages with the `pi-package` keyword and a `pi` manifest in `package.json`.

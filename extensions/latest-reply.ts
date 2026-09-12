@@ -13,7 +13,11 @@ function loadBindings(): Record<string, string[]> {
     return Object.fromEntries(
       Object.entries(config)
         .filter(([name]) => name.startsWith("pi.latestReply."))
-        .map(([name, value]) => [name, Array.isArray(value) ? value : [value]]),
+        .map(([name, value]) => {
+          const keys = Array.isArray(value) ? value.filter((key): key is string => typeof key === "string") : typeof value === "string" ? [value] : [];
+          return [name, keys];
+        })
+        .filter(([, keys]) => keys.length > 0),
     ) as Record<string, string[]>;
   } catch {
     return {};
@@ -116,7 +120,7 @@ class ReplyViewer {
         this.nextMatch(1);
       } else if (matchesKey(data, Key.backspace)) {
         this.searchQuery = this.searchQuery.slice(0, -1);
-      } else if (data.length === 1 && data.charCodeAt(0) >= 32) {
+      } else if (data.length === 1 && data.charCodeAt(0) >= 32 && this.searchQuery.length < 100) {
         this.searchQuery += data;
       }
       return;
