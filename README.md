@@ -86,6 +86,23 @@ The defaults are stored in `~/.pi/agent/keybindings.json` and can be changed the
 
 Run `/reload` after changing them.
 
+## Popup size
+
+The default popup uses 97% of the terminal width and 94% of its height. Adjust it in `~/.pi/agent/settings.json`:
+
+```json
+{
+  "piLatestReply": {
+    "width": "97%",
+    "maxHeight": "94%"
+  }
+}
+```
+
+Values may be percentages or terminal-cell numbers. Run `/reload` after changing them.
+
+The response viewer is intentionally read-only; editing a response would turn it into a separate document rather than a conversation viewer.
+
 The response is captured from Pi's finalized `message_end` event. It is not written to a separate temporary Markdown file.
 
 ## Configuration

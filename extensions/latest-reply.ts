@@ -27,6 +27,22 @@ function loadBindings(): Record<string, string[]> {
 }
 
 const bindings = loadBindings();
+
+function loadLayout(): { width: string | number; maxHeight: string | number } {
+  try {
+    const dir = process.env.PI_CODING_AGENT_DIR || join(homedir(), ".pi", "agent");
+    const settings = JSON.parse(readFileSync(join(dir, "settings.json"), "utf8"));
+    const layout = settings.piLatestReply;
+    return {
+      width: typeof layout?.width === "string" || typeof layout?.width === "number" ? layout.width : "92%",
+      maxHeight: typeof layout?.maxHeight === "string" || typeof layout?.maxHeight === "number" ? layout.maxHeight : "88%",
+    };
+  } catch {
+    return { width: "92%", maxHeight: "88%" };
+  }
+}
+
+const layout = loadLayout();
 const keysFor = (name: string, fallback: string[]) => bindings[name] ?? fallback;
 const matchesBinding = (data: string, name: string, fallback: string[]) =>
   keysFor(name, fallback).some((key) => matchesKey(data, key));
@@ -200,7 +216,12 @@ class ReplyViewer {
     const contentWidth = Math.max(10, width - 4);
     const rendered = this.markdown.render(contentWidth);
     const terminalRows = process.stdout.rows || 24;
-    const pageSize = Math.max(6, Math.min(32, Math.floor(terminalRows * 0.65) - 4));
+    const configuredHeight = typeof layout.maxHeight === "number"
+      ? layout.maxHeight
+      : layout.maxHeight.endsWith("%")
+        ? terminalRows * Number.parseFloat(layout.maxHeight) / 100
+        : Number.parseFloat(layout.maxHeight);
+    const pageSize = Math.max(6, Math.min(48, Math.floor(configuredHeight) - 4));
     const maxOffset = Math.max(0, rendered.length - pageSize);
     this.offset = Math.max(0, Math.min(this.offset, maxOffset));
     this.searchMatches = this.searchQuery
@@ -306,7 +327,7 @@ export default function (pi: any) {
       },
       {
         overlay: true,
-        overlayOptions: { width: "85%", maxHeight: "80%", anchor: "center", margin: 0 },
+        overlayOptions: { width: layout.width, maxHeight: layout.maxHeight, anchor: "center", margin: 0 },
       },
     );
   };
