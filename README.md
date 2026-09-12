@@ -125,6 +125,12 @@ Pi's normal editor binding for `Ctrl+U` can be disabled separately in `~/.pi/age
 - Copying deliberately uses Pi's exported clipboard utility; it does not duplicate Pi's `/copy` command.
 - `/latest-reply` is useful for testing when a terminal or tmux setup intercepts `Alt+V`.
 
+## Screenshots
+
+![Reply viewer](assets/screenshot_01.png)
+
+![Prompt and reply toggle](assets/screenshot_02.png)
+
 ## Demo checklist
 
 For a short screenshot or GIF:
@@ -149,6 +155,6 @@ Pi provides `@earendil-works/pi-coding-agent` and `@earendil-works/pi-tui` when 
 
 ## Package metadata
 
-This repository is a Pi package: `package.json` declares the `pi-package` keyword and the `pi.extensions` manifest used by Pi's package gallery. The npm package contains only the README, license, manifest, and `extensions/` directory—no credentials, project-local settings, screenshots, recordings, or generated session data.
+This repository is a Pi package: `package.json` declares the `pi-package` keyword and the `pi.extensions` manifest used by Pi's package gallery. The npm package contains the README, license, manifest, extension, and these two screenshots. It contains no credentials, project-local settings, recordings, or generated session data.
 
 The GitHub source repository is also available for review and direct installation.

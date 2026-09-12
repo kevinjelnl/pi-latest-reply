@@ -18,16 +18,20 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kevinjelnl/pi-latest-reply.git"
+    "url": "git+https://github.com/kevinjelnl/pi-latest-reply.git"
   },
   "homepage": "https://github.com/kevinjelnl/pi-latest-reply",
   "files": [
     "README.md",
     "LICENSE",
-    "extensions"
+    "extensions",
+    "assets"
   ],
   "pi": {
-    "extensions": ["./extensions"]
+    "extensions": [
+      "./extensions"
+    ],
+    "image": "https://raw.githubusercontent.com/kevinjelnl/pi-latest-reply/main/assets/screenshot_01.png"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*",

@@ -221,7 +221,7 @@ class ReplyViewer {
       : layout.maxHeight.endsWith("%")
         ? terminalRows * Number.parseFloat(layout.maxHeight) / 100
         : Number.parseFloat(layout.maxHeight);
-    const pageSize = Math.max(6, Math.min(48, Math.floor(configuredHeight) - 4));
+    const pageSize = Math.max(6, Math.min(48, Math.floor(configuredHeight) - 5));
     const maxOffset = Math.max(0, rendered.length - pageSize);
     this.offset = Math.max(0, Math.min(this.offset, maxOffset));
     this.searchMatches = this.searchQuery
@@ -245,18 +245,18 @@ class ReplyViewer {
     };
     const top = border("╭" + "─".repeat(Math.max(0, width - 2)) + "╮");
     const bottom = border("╰" + "─".repeat(Math.max(0, width - 2)) + "╯");
-    const header = body(
-      this.searchMode
-        ? this.theme.fg("accent", `Search: ${this.searchQuery}_  [Enter] find  [Esc] cancel`)
-        : this.theme.fg("accent", `${this.prompt ? "Prompt" : "Reply"} ${this.index + 1}/${this.turns.length}`) +
-          `  [${keysFor("pi.latestReply.previous", ["h"])[0]}/${keysFor("pi.latestReply.next", ["l"])[0]}] previous/next  [${keysFor("pi.latestReply.latest", ["shift+l"])[0]}] latest  [${keysFor("pi.latestReply.prompt", ["p"])[0]}] prompt/reply  [/] search  [n/N] next/prev  [j/k] move  [${keysFor("pi.latestReply.close", ["q"])[0]}] close`,
-    );
+    const title = this.searchMode
+      ? this.theme.fg("accent", `Search: ${this.searchQuery}_  [Enter] find  [Esc] cancel`)
+      : this.theme.fg("accent", `${this.prompt ? "Prompt" : "Reply"} ${this.index + 1}/${this.turns.length}`);
+    const divider = body(this.theme.fg(this.borderColor, "─".repeat(contentWidth)));
+    const shortcuts = `  [${keysFor("pi.latestReply.previous", ["h"])[0]}/${keysFor("pi.latestReply.next", ["l"])[0]}] prev/next  [${keysFor("pi.latestReply.latest", ["shift+l"])[0]}] latest  [${keysFor("pi.latestReply.prompt", ["p"])[0]}] prompt/reply  [/] search  [n/N] matches  [j/k] move  [${keysFor("pi.latestReply.close", ["q"])[0]}] close`;
     const footerText = this.status || `${this.offset + 1}-${Math.min(this.offset + pageSize, rendered.length)} / ${rendered.length}  •  [${keysFor("pi.latestReply.copy", ["ctrl+c"])[0]}] copy  •  close and use /copy`;
     const footer = body(this.theme.fg(this.status ? "warning" : "dim", footerText));
 
     return [
       top,
-      header,
+      body(title + this.theme.fg("dim", shortcuts)),
+      divider,
       ...rendered.slice(this.offset, this.offset + pageSize).map((line, index) => body(line, this.offset + index)),
       footer,
       bottom,
