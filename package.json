@@ -1,0 +1,25 @@
+{
+  "name": "pi-latest-reply-viewer",
+  "version": "0.1.0",
+  "description": "Open the latest Pi assistant response in a keyboard-navigable popup.",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-coding-agent",
+    "pi-extension",
+    "terminal",
+    "tmux",
+    "ssh",
+    "vim",
+    "markdown",
+    "chat-history",
+    "response-viewer"
+  ],
+  "license": "MIT",
+  "pi": {
+    "extensions": ["./extensions"]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-tui": "*"
+  }
+}
