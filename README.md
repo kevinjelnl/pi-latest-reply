@@ -4,6 +4,12 @@ Open Pi assistant responses in a centered, keyboard-navigable popup with Markdow
 
 Useful when Pi is running in a small terminal, over SSH, or inside tmux and scrolling through the terminal with a mouse is inconvenient.
 
+## Preview
+
+![Reply viewer](assets/screenshot_01.png)
+
+![Prompt and reply toggle](assets/screenshot_02.png)
+
 ## Install
 
 From npm:
@@ -124,24 +130,6 @@ Pi's normal editor binding for `Ctrl+U` can be disabled separately in `~/.pi/age
 - The viewer is read-only. Search is intentionally lightweight: `/` starts a case-insensitive whole-word search, `n`/`Shift+N` cycle matches, and `Escape` cancels search without closing the popup. Moving between replies with `h`/`l` exits search and clears its highlights so stale matches cannot carry over. It does not attempt to implement full Vim counts or modes.
 - Copying deliberately uses Pi's exported clipboard utility; it does not duplicate Pi's `/copy` command.
 - `/latest-reply` is useful for testing when a terminal or tmux setup intercepts `Alt+V`.
-
-## Screenshots
-
-![Reply viewer](assets/screenshot_01.png)
-
-![Prompt and reply toggle](assets/screenshot_02.png)
-
-## Demo checklist
-
-For a short screenshot or GIF:
-
-1. Use a compact terminal window or tmux pane.
-2. Ask Pi for a long Markdown response with a heading, a Python code block, a list, and a quote.
-3. Open the viewer with `Alt+V`.
-4. Show `h`/`l` reply history, `Shift+L` latest, `/` search, and `j`/`k` scrolling.
-5. Close with `q`, then run `/copy` to demonstrate Pi's native copy command.
-
-Keep the recording under 15 seconds and crop out unrelated terminal tabs, usernames, paths, and environment details.
 
 ## Development
 
