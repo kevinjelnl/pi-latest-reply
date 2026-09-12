@@ -1,4 +1,4 @@
-# pi-latest-reply-viewer
+# pi-latest-reply
 
 Open Pi assistant responses in a centered, keyboard-navigable popup with Markdown rendering and Vim-like navigation.
 
@@ -6,16 +6,22 @@ Useful when Pi is running in a small terminal, over SSH, or inside tmux and scro
 
 ## Install
 
-From a Git repository:
+From npm:
 
 ```bash
-pi install git:github.com/kevinjelnl/pi-latest-reply-viewer
+pi install npm:pi-latest-reply
+```
+
+Or install directly from GitHub:
+
+```bash
+pi install git:github.com/kevinjelnl/pi-latest-reply
 ```
 
 Or try a local checkout:
 
 ```bash
-pi install /path/to/pi-latest-reply-viewer
+pi install /path/to/pi-latest-reply
 ```
 
 Restart Pi, or run `/reload` if the extension is already installed.
@@ -46,6 +52,7 @@ The popup supports:
 |---|---|
 | `h` / `l` | Show the previous/next assistant response |
 | `Shift+L` | Jump to the most recent response |
+| `p` | Toggle between the current reply and its prompt |
 | `/` | Start whole-word search |
 | `n` / `Shift+N` | Next/previous match |
 | `Ctrl+C` | Copy the latest reply; disabled on older replies |
@@ -56,7 +63,7 @@ The popup supports:
 | `PageUp` / `PageDown` | Scroll by a page |
 | `q` / `Escape` / `Alt+V` | Close the popup |
 
-The border follows the currently selected Pi thinking level (`thinkingLow`, `thinkingMedium`, `thinkingHigh`, etc.). The popup keeps the textual assistant replies from the active session branch, so previous replies remain available while Pi is running. Copying is intentionally limited to the latest reply; `/copy` remains Pi's built-in command.
+The border follows the currently selected Pi thinking level (`thinkingLow`, `thinkingMedium`, `thinkingHigh`, etc.). The popup keeps user prompts and textual assistant replies from the active session branch, so previous turns remain available while Pi is running. Press `p` to toggle the selected turn between its prompt and reply. Copying is intentionally limited to the latest reply; `/copy` remains Pi's built-in command.
 
 ## Keybindings
 
@@ -69,6 +76,7 @@ The defaults are stored in `~/.pi/agent/keybindings.json` and can be changed the
   "pi.latestReply.previous": "h",
   "pi.latestReply.next": "l",
   "pi.latestReply.latest": "shift+l",
+  "pi.latestReply.prompt": "p",
   "pi.latestReply.copy": "ctrl+c",
   "pi.latestReply.search": "/",
   "pi.latestReply.searchNext": "n",
@@ -122,25 +130,8 @@ extensions/latest-reply.ts
 
 Pi provides `@earendil-works/pi-coding-agent` and `@earendil-works/pi-tui` when loading extensions, so they are listed as peer dependencies rather than bundled into this package.
 
-## Publishing
+## Package metadata
 
-1. Create a public GitHub repository named `pi-latest-reply-viewer` under `kevinjelnl`.
-2. Push this package to the repository.
-3. Commit and push:
+This repository is a Pi package: `package.json` declares the `pi-package` keyword and the `pi.extensions` manifest used by Pi's package gallery. The npm package contains only the README, license, manifest, and `extensions/` directory—no credentials, project-local settings, screenshots, recordings, or generated session data.
 
-```bash
-git init
-git add .
-git commit -m "Initial release"
-git branch -M main
-git remote add origin git@github.com:kevinjelnl/pi-latest-reply-viewer.git
-git push -u origin main
-```
-
-4. Test the published package:
-
-```bash
-pi install git:github.com/kevinjelnl/pi-latest-reply-viewer
-```
-
-Pi's package gallery discovers packages with the `pi-package` keyword and a `pi` manifest in `package.json`.
+The GitHub source repository is also available for review and direct installation.

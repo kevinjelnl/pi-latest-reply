@@ -1,5 +1,5 @@
 {
-  "name": "pi-latest-reply-viewer",
+  "name": "pi-latest-reply",
   "version": "0.1.0",
   "description": "Open the latest Pi assistant response in a keyboard-navigable popup.",
   "keywords": [
@@ -18,9 +18,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/kevinjelnl/pi-latest-reply-viewer.git"
+    "url": "https://github.com/kevinjelnl/pi-latest-reply.git"
   },
-  "homepage": "https://github.com/kevinjelnl/pi-latest-reply-viewer",
+  "homepage": "https://github.com/kevinjelnl/pi-latest-reply",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "extensions"
+  ],
   "pi": {
     "extensions": ["./extensions"]
   },

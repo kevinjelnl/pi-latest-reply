@@ -4,7 +4,9 @@ import { join } from "node:path";
 import { Key, Markdown, matchesKey, sliceByColumn, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { copyToClipboard, getMarkdownTheme } from "@earendil-works/pi-coding-agent";
 
-let replies: string[] = [];
+type Turn = { prompt: string; reply: string };
+let turns: Turn[] = [];
+let pendingPrompt = "";
 
 function loadBindings(): Record<string, string[]> {
   try {
@@ -37,10 +39,15 @@ function textOf(message: any): string {
     .join("\n");
 }
 
-function addReply(message: any): void {
-  if (message?.role !== "assistant") return;
+function addMessage(message: any): void {
   const text = textOf(message);
-  if (text && replies.at(-1) !== text) replies.push(text);
+  if (!text) return;
+  if (message.role === "user") {
+    pendingPrompt = text;
+  } else if (message.role === "assistant" && turns.at(-1)?.reply !== text) {
+    turns.push({ prompt: pendingPrompt, reply: text });
+    pendingPrompt = "";
+  }
 }
 
 function stripAnsi(text: string): string {
@@ -68,14 +75,20 @@ class ReplyViewer {
   private searchMatches: number[] = [];
 
   constructor(
-    private readonly replies: string[],
+    private readonly turns: Turn[],
     private index: number,
     private readonly theme: any,
     private readonly borderColor: string,
     private readonly done: () => void,
-    private readonly onCopy: (text: string, index: number) => void,
+    private readonly onCopy: (text: string, index: number, prompt: boolean) => void,
   ) {
-    this.markdown = new Markdown(replies[index], 0, 0, getMarkdownTheme());
+    this.markdown = new Markdown(this.currentText(), 0, 0, getMarkdownTheme());
+  }
+
+  private prompt = false;
+
+  private currentText(): string {
+    return this.prompt ? this.turns[this.index].prompt || "(No user prompt recorded)" : this.turns[this.index].reply;
   }
 
   setStatus(status: string): void {
@@ -83,17 +96,27 @@ class ReplyViewer {
   }
 
   private select(index: number): void {
-    this.index = Math.max(0, Math.min(this.replies.length - 1, index));
+    this.index = Math.max(0, Math.min(this.turns.length - 1, index));
     this.offset = 0;
     this.searchMode = false;
     this.searchQuery = "";
     this.searchMatches = [];
     this.status = "";
-    this.markdown = new Markdown(this.replies[this.index], 0, 0, getMarkdownTheme());
+    this.markdown = new Markdown(this.currentText(), 0, 0, getMarkdownTheme());
   }
 
   private latest(): void {
-    this.select(this.replies.length - 1);
+    this.select(this.turns.length - 1);
+  }
+
+  private togglePrompt(): void {
+    this.prompt = !this.prompt;
+    this.offset = 0;
+    this.searchMode = false;
+    this.searchQuery = "";
+    this.searchMatches = [];
+    this.status = "";
+    this.markdown = new Markdown(this.currentText(), 0, 0, getMarkdownTheme());
   }
 
   private nextMatch(direction: number): void {
@@ -158,10 +181,11 @@ class ReplyViewer {
     }
 
     if (matchesBinding(data, "pi.latestReply.copy", ["ctrl+c"])) {
-      this.onCopy(this.replies[this.index], this.index);
+      this.onCopy(this.turns[this.index].reply, this.index, this.prompt);
       return;
     }
-    if (matchesBinding(data, "pi.latestReply.latest", ["shift+l"])) this.latest();
+    if (matchesBinding(data, "pi.latestReply.prompt", ["p"])) this.togglePrompt();
+    else if (matchesBinding(data, "pi.latestReply.latest", ["shift+l"])) this.latest();
     else if (matchesBinding(data, "pi.latestReply.previous", ["h"])) this.select(this.index - 1);
     else if (matchesBinding(data, "pi.latestReply.next", ["l"])) this.select(this.index + 1);
     else if (data === "g") this.offset = 0;
@@ -203,8 +227,8 @@ class ReplyViewer {
     const header = body(
       this.searchMode
         ? this.theme.fg("accent", `Search: ${this.searchQuery}_  [Enter] find  [Esc] cancel`)
-        : this.theme.fg("accent", `Reply ${this.index + 1}/${this.replies.length}`) +
-          `  [${keysFor("pi.latestReply.previous", ["h"])[0]}/${keysFor("pi.latestReply.next", ["l"])[0]}] previous/next  [${keysFor("pi.latestReply.latest", ["shift+l"])[0]}] latest  [/] search  [n/N] next/prev  [j/k] move  [${keysFor("pi.latestReply.close", ["q"])[0]}] close`,
+        : this.theme.fg("accent", `${this.prompt ? "Prompt" : "Reply"} ${this.index + 1}/${this.turns.length}`) +
+          `  [${keysFor("pi.latestReply.previous", ["h"])[0]}/${keysFor("pi.latestReply.next", ["l"])[0]}] previous/next  [${keysFor("pi.latestReply.latest", ["shift+l"])[0]}] latest  [${keysFor("pi.latestReply.prompt", ["p"])[0]}] prompt/reply  [/] search  [n/N] next/prev  [j/k] move  [${keysFor("pi.latestReply.close", ["q"])[0]}] close`,
     );
     const footerText = this.status || `${this.offset + 1}-${Math.min(this.offset + pageSize, rendered.length)} / ${rendered.length}  •  [${keysFor("pi.latestReply.copy", ["ctrl+c"])[0]}] copy  •  close and use /copy`;
     const footer = body(this.theme.fg(this.status ? "warning" : "dim", footerText));
@@ -223,16 +247,17 @@ class ReplyViewer {
 
 export default function (pi: any) {
   pi.on("session_start", (_event: any, ctx: any) => {
-    replies = [];
-    for (const entry of ctx.sessionManager.getBranch()) addReply(entry.message);
+    turns = [];
+    pendingPrompt = "";
+    for (const entry of ctx.sessionManager.getBranch()) addMessage(entry.message);
   });
-  pi.on("message_end", (event: any) => addReply(event.message));
+  pi.on("message_end", (event: any) => addMessage(event.message));
 
   const showLatest = async (ctx: any) => {
-    if (!replies.length) {
-      for (const entry of ctx.sessionManager.getBranch()) addReply(entry.message);
+    if (!turns.length) {
+      for (const entry of ctx.sessionManager.getBranch()) addMessage(entry.message);
     }
-    if (!replies.length) {
+    if (!turns.length) {
       ctx.ui.notify("No assistant response yet", "warning");
       return;
     }
@@ -245,13 +270,18 @@ export default function (pi: any) {
       (tui: any, theme: any, _keybindings: any, done: () => void) => {
         let viewer: ReplyViewer;
         viewer = new ReplyViewer(
-          replies,
-          replies.length - 1,
+          turns,
+          turns.length - 1,
           theme,
           borderColor,
           done,
-          async (text: string, index: number) => {
-            if (index !== replies.length - 1) {
+          async (text: string, index: number, prompt: boolean) => {
+            if (prompt) {
+              viewer.setStatus("Copy is only enabled for replies");
+              tui.requestRender();
+              return;
+            }
+            if (index !== turns.length - 1) {
               viewer.setStatus("Copy is only enabled for the latest reply");
               tui.requestRender();
               return;
