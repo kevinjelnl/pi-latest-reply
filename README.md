@@ -100,6 +100,18 @@ Pi's normal editor binding for `Ctrl+U` can be disabled separately in `~/.pi/age
 - Copying deliberately uses Pi's exported clipboard utility; it does not duplicate Pi's `/copy` command.
 - `/latest-reply` is useful for testing when a terminal or tmux setup intercepts `Alt+V`.
 
+## Demo checklist
+
+For a short screenshot or GIF:
+
+1. Use a compact terminal window or tmux pane.
+2. Ask Pi for a long Markdown response with a heading, a Python code block, a list, and a quote.
+3. Open the viewer with `Alt+V`.
+4. Show `h`/`l` reply history, `Shift+L` latest, `/` search, and `j`/`k` scrolling.
+5. Close with `q`, then run `/copy` to demonstrate Pi's native copy command.
+
+Keep the recording under 15 seconds and crop out unrelated terminal tabs, usernames, paths, and environment details.
+
 ## Development
 
 The extension is a single TypeScript file:
