@@ -1,8 +1,6 @@
 # pi-latest-reply
 
-Open Pi assistant responses in a centered, keyboard-navigable popup with Markdown rendering and Vim-like navigation.
-
-Useful when Pi is running in a small terminal, over SSH, or inside tmux and scrolling through the terminal with a mouse is inconvenient.
+Pi Latest Reply puts your Pi conversation history one keystroke away. Open the current or previous assistant responses in a centered, readable popup with Markdown rendering, Vim-like navigation, instant search, and quick prompt/reply toggling. It’s built for the moments when terminal scrolling gets in the way—especially in compact windows, SSH sessions, and tmux—so you can revisit useful answers quickly without losing your flow. The extension stays intentionally focused on Pi and keyboard-first workflows, with copying limited to the latest reply, keeping the experience fast, focused, and refreshingly simple.
 
 ## Preview
 
