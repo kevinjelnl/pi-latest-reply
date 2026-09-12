@@ -43,22 +43,16 @@ function stripAnsi(text: string): string {
   return text.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, "");
 }
 
-function fuzzySpan(text: string, query: string): [number, number] | undefined {
-  let index = 0;
-  let start = -1;
-  let end = -1;
-  for (const char of query.toLowerCase()) {
-    index = text.toLowerCase().indexOf(char, index);
-    if (index < 0) return undefined;
-    if (start < 0) start = index;
-    end = index + 1;
-    index++;
-  }
-  return start < 0 ? undefined : [start, end];
+function wordSpan(text: string, query: string): [number, number] | undefined {
+  const value = query.trim();
+  if (!value) return undefined;
+  const escaped = value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = new RegExp(`(?:^|[^\\p{L}\\p{N}_])(${escaped})(?=$|[^\\p{L}\\p{N}_])`, "iu").exec(text);
+  return match?.index === undefined ? undefined : [match.index + match[0].length - value.length, match.index + match[0].length];
 }
 
-function fuzzyIncludes(text: string, query: string): boolean {
-  return fuzzySpan(text, query) !== undefined;
+function wordIncludes(text: string, query: string): boolean {
+  return wordSpan(text, query) !== undefined;
 }
 
 class ReplyViewer {
@@ -87,8 +81,10 @@ class ReplyViewer {
   private select(index: number): void {
     this.index = Math.max(0, Math.min(this.replies.length - 1, index));
     this.offset = 0;
+    this.searchMode = false;
+    this.searchQuery = "";
     this.searchMatches = [];
-    this.status = this.searchQuery ? `Search: ${this.searchQuery}` : "";
+    this.status = "";
     this.markdown = new Markdown(this.replies[this.index], 0, 0, getMarkdownTheme());
   }
 
@@ -112,7 +108,9 @@ class ReplyViewer {
     if (this.searchMode) {
       if (matchesKey(data, Key.escape) || matchesKey(data, "escape") || data === "\x1b") {
         this.searchMode = false;
-        this.status = this.searchQuery ? `Search: ${this.searchQuery}` : "";
+        this.searchQuery = "";
+        this.searchMatches = [];
+        this.status = "";
       } else if (matchesKey(data, Key.enter)) {
         this.searchMode = false;
         this.nextMatch(1);
@@ -139,7 +137,18 @@ class ReplyViewer {
       return;
     }
 
-    if (matchesKey(data, Key.escape) || matchesKey(data, "escape") || data === "\x1b" || matchesBinding(data, "pi.latestReply.close", ["q"]) || matchesBinding(data, "pi.latestReply.open", ["alt+v"])) {
+    if (matchesKey(data, Key.escape) || matchesKey(data, "escape") || data === "\x1b") {
+      if (this.searchQuery) {
+        this.searchMode = false;
+        this.searchQuery = "";
+        this.searchMatches = [];
+        this.status = "";
+        return;
+      }
+      this.done();
+      return;
+    }
+    if (matchesBinding(data, "pi.latestReply.close", ["q"]) || matchesBinding(data, "pi.latestReply.open", ["alt+v"])) {
       this.done();
       return;
     }
@@ -167,14 +176,14 @@ class ReplyViewer {
     const maxOffset = Math.max(0, rendered.length - pageSize);
     this.offset = Math.max(0, Math.min(this.offset, maxOffset));
     this.searchMatches = this.searchQuery
-      ? rendered.map((line, index) => fuzzyIncludes(stripAnsi(line), this.searchQuery) ? index : -1).filter((index) => index >= 0)
+      ? rendered.map((line, index) => wordIncludes(stripAnsi(line), this.searchQuery) ? index : -1).filter((index) => index >= 0)
       : [];
 
     const border = (line: string) => this.theme.fg(this.borderColor, line);
     const body = (line: string, row = -1) => {
       let content = truncateToWidth(line, contentWidth);
       if (this.searchQuery) {
-        const span = fuzzySpan(stripAnsi(content), this.searchQuery);
+            const span = wordSpan(stripAnsi(content), this.searchQuery);
         if (span) {
           const before = sliceByColumn(content, 0, span[0], true);
           const match = sliceByColumn(content, span[0], span[1] - span[0], true);
