@@ -1,6 +1,6 @@
 {
   "name": "@kevinjel/pi-latest-reply",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Open the latest Pi assistant response in a keyboard-navigable popup.",
   "keywords": [
     "pi-package",
