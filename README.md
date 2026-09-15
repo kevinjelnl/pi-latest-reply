@@ -4,6 +4,8 @@ Pi Latest Reply puts your Pi conversation history one keystroke away. Open the c
 
 ## Preview
 
+![Pi Latest Reply on mobile](assets/mobile_example.png)
+
 ![Reply viewer](assets/screenshot_01.png)
 
 ![Prompt and reply toggle](assets/screenshot_02.png)
