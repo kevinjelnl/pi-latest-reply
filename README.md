@@ -50,7 +50,7 @@ You can also open it with:
 
 Pi's built-in `/copy` command continues to copy the complete latest assistant response, including its Markdown/code fences.
 
-The popup renders Markdown with Pi's normal colors and uses a lightweight thinking-color border rather than an opaque fill.
+The popup renders Markdown with Pi's normal colors, uses a rounded, heavier thinking-color border, and has a black background for clear separation from the conversation.
 
 The popup supports:
 
@@ -100,12 +100,13 @@ The default popup uses 97% of the terminal width and 94% of its height. Adjust i
 {
   "piLatestReply": {
     "width": "97%",
-    "maxHeight": "94%"
+    "maxHeight": "94%",
+    "topOffset": 2
   }
 }
 ```
 
-Values may be percentages or terminal-cell numbers. Run `/reload` after changing them.
+Values may be percentages or terminal-cell numbers. `topOffset` controls the popup's fixed vertical offset in terminal rows; `0` pins it directly to the top and `2` leaves a small gap. Run `/reload` after changing them.
 
 The response viewer is intentionally read-only; editing a response would turn it into a separate document rather than a conversation viewer.
 

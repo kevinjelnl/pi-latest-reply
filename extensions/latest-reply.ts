@@ -28,7 +28,7 @@ function loadBindings(): Record<string, string[]> {
 
 const bindings = loadBindings();
 
-function loadLayout(): { width: string | number; maxHeight: string | number } {
+function loadLayout(): { width: string | number; maxHeight: string | number; topOffset: number } {
   try {
     const dir = process.env.PI_CODING_AGENT_DIR || join(homedir(), ".pi", "agent");
     const settings = JSON.parse(readFileSync(join(dir, "settings.json"), "utf8"));
@@ -36,9 +36,10 @@ function loadLayout(): { width: string | number; maxHeight: string | number } {
     return {
       width: typeof layout?.width === "string" || typeof layout?.width === "number" ? layout.width : "92%",
       maxHeight: typeof layout?.maxHeight === "string" || typeof layout?.maxHeight === "number" ? layout.maxHeight : "88%",
+      topOffset: typeof layout?.topOffset === "number" ? layout.topOffset : 2,
     };
   } catch {
-    return { width: "92%", maxHeight: "88%" };
+    return { width: "92%", maxHeight: "88%", topOffset: 2 };
   }
 }
 
@@ -229,6 +230,7 @@ class ReplyViewer {
       : [];
 
     const border = (line: string) => this.theme.fg(this.borderColor, line);
+    const panel = (line: string) => `\x1b[48;5;0m${line}\x1b[49m`;
     const body = (line: string, row = -1) => {
       let content = truncateToWidth(line, contentWidth);
       if (this.searchQuery) {
@@ -241,10 +243,10 @@ class ReplyViewer {
           content = before + this.theme.bg(style, match) + after;
         }
       }
-      return border("│") + " " + content + " ".repeat(Math.max(0, contentWidth - visibleWidth(content))) + " " + border("│");
+      return panel(border("│") + " " + content + " ".repeat(Math.max(0, contentWidth - visibleWidth(content))) + " " + border("│"));
     };
-    const top = border("╭" + "─".repeat(Math.max(0, width - 2)) + "╮");
-    const bottom = border("╰" + "─".repeat(Math.max(0, width - 2)) + "╯");
+    const top = panel(border("╭" + "━".repeat(Math.max(0, width - 2)) + "╮"));
+    const bottom = panel(border("╰" + "━".repeat(Math.max(0, width - 2)) + "╯"));
     const title = this.searchMode
       ? this.theme.fg("accent", `Search: ${this.searchQuery}_  [Enter] find  [Esc] cancel`)
       : this.theme.fg("accent", `${this.prompt ? "Prompt" : "Reply"} ${this.index + 1}/${this.turns.length}`);
@@ -327,7 +329,7 @@ export default function (pi: any) {
       },
       {
         overlay: true,
-        overlayOptions: { width: layout.width, maxHeight: layout.maxHeight, anchor: "center", margin: 0 },
+        overlayOptions: { width: layout.width, maxHeight: layout.maxHeight, anchor: "top-center", offsetY: layout.topOffset, margin: 0 },
       },
     );
   };

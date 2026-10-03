@@ -10,12 +10,12 @@ Keep the extension in `extensions/`; Pi discovers that directory by convention. 
 
 ## Runtime behavior
 
-The extension records finalized user prompts and textual assistant replies from the active session branch, then opens a read-only Markdown viewer. Its public entry points are:
+The extension records finalized user prompts and textual assistant replies from the active session branch, then opens a read-only Markdown viewer with a black background and thinking-level-colored rounded heavy border. Its public entry points are:
 
 - `Alt+V`
 - `/latest-reply`
 
-User keybindings live in `~/.pi/agent/keybindings.json` under `pi.latestReply.*`. Viewer sizing lives in `~/.pi/agent/settings.json` under `piLatestReply`.
+User keybindings live in `~/.pi/agent/keybindings.json` under `pi.latestReply.*`. Viewer sizing and vertical position live in `~/.pi/agent/settings.json` under `piLatestReply`. The `topOffset` setting controls a fixed vertical offset in terminal rows; `0` pins the popup to the top and `2` leaves a small gap.
 
 ## Development
 
